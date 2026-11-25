@@ -25,7 +25,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       # 仓库自带 pnpm-lock.yaml，优先用 pnpm 保证依赖版本一致
       - name: Install dependencies
