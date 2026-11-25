@@ -1,0 +1,45 @@
+# 自动部署到 Cloudflare Workers
+# 触发条件：push 到 main（即每次更新仓库代码）+ 手动触发
+# 密码保护凭据不写死在仓库里：AUTH_PASSWORD 从 Secrets 注入
+name: Deploy to Cloudflare Workers
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'skills/**'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-cloudflare
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # 仓库自带 pnpm-lock.yaml，优先用 pnpm 保证依赖版本一致
+      - name: Install dependencies
+        run: |
+          npm i -g pnpm@10
+          pnpm install --frozen-lockfile
+
+      - name: Build dist
+        run: bash scripts/build.sh
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # AUTH_PASSWORD 是真实访问密码（Secret），覆盖 wrangler.jsonc 里的占位值
+          command: deploy --var AUTH_PASSWORD:${{ secrets.AUTH_PASSWORD }}

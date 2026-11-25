@@ -7,12 +7,19 @@
     "enabled": true
   },
   "previews": {},
+  // 全站访问密码：浏览器打开时弹出账号密码框，输错无法看到任何内容（含图片与 API）
+  "vars": {
+    "AUTH_USERNAME": "admin",
+    // 仓库公开，这里只放占位默认密码；真实密码通过部署时的
+    // `wrangler deploy --var AUTH_PASSWORD:<secret>` 注入（GitHub Actions Secrets）
+    "AUTH_PASSWORD": "2qG3bdMfoa6N9ehL"
+  },
   // 可选环境变量：通过 `cf workers secrets update PROXY_ALLOWED_ORIGINS --worker ai-pose-gallery-zh --text "https://..." --type secret_text`
   // 或在 Cloudflare 控制台 Variables and Secrets 中配置 PROXY_ALLOWED_ORIGINS（支持逗号分隔的精确域名或 https://*.openai.com 泛子域名）
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
-    "run_worker_first": ["/api/*"]
+    "run_worker_first": true
   }
 }
