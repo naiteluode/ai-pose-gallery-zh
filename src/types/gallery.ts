@@ -120,7 +120,7 @@ export interface ComfyUiParams {
 }
 
 export interface GptParams {
-  endpointMode: 'images_edits_json' | 'images_edits' | 'responses' | 'chat'
+  endpointMode: 'images_edits_json' | 'images_edits' | 'responses' | 'chat' | 'images_generations'
   size: 'auto' | '1024x1536' | '1024x1024' | '1536x1024'
   quality: 'auto' | 'low' | 'medium' | 'high' | 'xhigh' | 'max'
   inputFidelity: 'high' | 'low'

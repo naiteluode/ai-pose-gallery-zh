@@ -1171,6 +1171,7 @@ function StudioPage() {
                           <SelectItem value="responses">/v1/responses</SelectItem>
                           <SelectItem value="chat">/v1/chat/completions</SelectItem>
                           <SelectItem value="images_edits">/v1/images/edits (Multipart)</SelectItem>
+                          <SelectItem value="images_generations">/v1/images/generations (Kolors)</SelectItem>
                         </SelectContent>
                       </Select>
                     </Field>

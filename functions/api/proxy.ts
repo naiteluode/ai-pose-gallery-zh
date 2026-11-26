@@ -22,6 +22,7 @@ const DEFAULT_ALLOWED_ORIGINS = [
   'https://generativelanguage.googleapis.com', // Google Gemini
   'https://api.openai.com', // OpenAI
   'https://api.pixai.art', // PixAI
+  'https://api.siliconflow.cn', // 硅基流动 / Kolors
 ]
 
 function matchOriginRule(target: URL, rawRule: string): boolean {
