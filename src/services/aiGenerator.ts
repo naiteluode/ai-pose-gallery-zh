@@ -1682,7 +1682,15 @@ export async function generateCharacterImage(params: {
         image_size: size,
         batch_size: 1,
       }
-      if (allImageRefs.length > 0) payload.image = allImageRefs[0]
+      // Kolors 仅支持 1 张参考图：多约束时必须用三合一拼图（带「图N」标签，与提示词的图N对应），
+      // 否则提示词引用的图2/图3 约束会被模型忽略，生成结果与参考无关
+      if (allImageRefs.length === 1) {
+        payload.image = allImageRefs[0]
+      } else if (allImageRefs.length > 1) {
+        payload.image = config.sendStitchedSheet
+          ? allImageRefs[allImageRefs.length - 1]
+          : await stitchRecipeCanvas(recipe)
+      }
 
       res = await smartFetch(
         `${v1}/images/generations`,
