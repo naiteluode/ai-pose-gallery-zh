@@ -1592,14 +1592,11 @@ export async function generateCharacterImage(params: {
   // 1) 用户显式选择了 base64 模式
   // 2) 或者勾选了「附带三合一 Canvas 合成图」（本地动态绘制无公网 URL）
   // 3) 或者使用 Gemini Native 原生接口 / OpenAI multipart/form-data 模式
-  // 4) images_generations（SiliconFlow Kolors 等）：参考图必须 data URI（裸 base64 会 400）
   const needBase64 =
     config.imagePassMode === 'base64' ||
     config.sendStitchedSheet ||
     (provider === 'gemini' && config.geminiParams.endpointMode === 'native') ||
-    (provider === 'gpt' &&
-      (config.gptParams.endpointMode === 'images_edits' ||
-        config.gptParams.endpointMode === 'images_generations'))
+    (provider === 'gpt' && config.gptParams.endpointMode === 'images_edits')
 
   const imageRefs: string[] = needBase64
     ? await Promise.all(rawSources.map(srcToPngDataUrl))
@@ -1668,39 +1665,6 @@ export async function generateCharacterImage(params: {
           method: 'POST',
           headers: { Authorization: `Bearer ${apiKey}` },
           body: fd,
-        },
-        config.useProxy
-      )
-      json = await res.json()
-    } else if (g.endpointMode === 'images_generations') {
-      // SiliconFlow Kolors 等 OpenAI Images 兼容端点：POST /v1/images/generations
-      // 参考图传 data URI（image 字段）；Kolors 仅支持 1 张参考图；image_size 采用 WxH 格式
-      const size = g.size === 'auto' ? '1024x1024' : g.size
-      const payload: Record<string, any> = {
-        model,
-        prompt,
-        image_size: size,
-        batch_size: 1,
-      }
-      // Kolors 仅支持 1 张参考图：多约束时必须用三合一拼图（带「图N」标签，与提示词的图N对应），
-      // 否则提示词引用的图2/图3 约束会被模型忽略，生成结果与参考无关
-      if (allImageRefs.length === 1) {
-        payload.image = allImageRefs[0]
-      } else if (allImageRefs.length > 1) {
-        payload.image = config.sendStitchedSheet
-          ? allImageRefs[allImageRefs.length - 1]
-          : await stitchRecipeCanvas(recipe)
-      }
-
-      res = await smartFetch(
-        `${v1}/images/generations`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${apiKey}`,
-          },
-          body: JSON.stringify(payload),
         },
         config.useProxy
       )
