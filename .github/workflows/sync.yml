@@ -1,11 +1,12 @@
 # 定时从源仓库 anhao/ai-pose-gallery-zh 同步更新
 # 有新提交时：merge 上游 → 自动构建 → 部署到 Cloudflare Workers
 # 无新提交时：跳过构建与部署
+# 注：GitHub schedule 在整点高峰经常延迟甚至跳过，故选错峰分钟点
 name: Sync upstream and deploy
 
 on:
   schedule:
-    - cron: '0 1 * * *' # UTC 1:00 = 北京时间每天 09:00
+    - cron: '43 0 * * *' # UTC 0:43 = 北京时间每天 08:43
   workflow_dispatch:
 
 concurrency:
